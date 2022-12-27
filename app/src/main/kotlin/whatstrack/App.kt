@@ -77,8 +77,9 @@ data class ButtonRow (
     val reply:ButtonReply
 )
 data class InteractiveAction(
-    val buttons:listOf ()<ButtonRow>
+    val buttons:List<ButtonRow>
 )
+
 data class InteractiveBody (
     val text:String
 )
@@ -88,14 +89,13 @@ data class InteractiveObject (
     val action:InteractiveAction
 )
 data class InteractiveButtonMessageObject (
-       val messaging_product:String,
+    val messaging_product:String,
     val recipient_type:String,
     val to:String,
     val type:String,
     val interactive:InteractiveObject
 )
 
-data class 
 class App {
 fun sendRequestToFacebook (requestBodyString:String){
       val client = HttpClient.newBuilder().build();
@@ -103,23 +103,68 @@ fun sendRequestToFacebook (requestBodyString:String){
         .uri(URI.create("https://graph.facebook.com/v15.0/103161752650905/messages"))
         .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
          .header("Content-Type", "application/json")
-         .header ("Authorization","Bearer EAAJF5XMdhTIBAEKrLVb4RHyIp6qOiiZB05A4AgIhpfD2WgG8SPbItGE0O0Xfmkk2hsPaCjAV03NIdw2dxZCtpFl7lZALgUv7AIZAJOZCpP8TwVZAj8Py5OKsZCzY0K1LIJEHIB37kl5TNYcXcL43Mxx34PO7wZBQqAfaUGo4wjxtbBhekPQomvyFSLILoOxi1TNJlIUgPTXepwZDZD")
+         .header ("Authorization","Bearer EAAJF5XMdhTIBAMlRBJlZA3SwNFrESknFjRmxw3UGUL6JFnVo1CvMIjkdZB4RT7rdqZAKdNLHbSMA9d6AFIzdqZAJskxcJV8WO5TTqGOm71jh5XhY2HraQak4DopAGxHyZBwjagN3CIGzbjiu7QwkJBRBik1YPfcrHxaA1bbIDyljDzLWxEZC7f1ZA1A87DWs74ZBCt48fjZA96wZDZD")
         .build()
     val response = client.send(request, HttpResponse.BodyHandlers.ofString());
     println(response.body())
+}
+
+fun sendInteractiveButtonMessage (){
+    val buttonRow1 = ButtonRow (
+        "reply",
+        ButtonReply (
+            "button1",
+            "Button 1"
+        )
+    )
+    val buttonRow2 = ButtonRow (
+        "reply",
+        ButtonReply (
+            "button2",
+            "Button 2"
+        )
+    )
+
+    val interactiveButtonMessageObject = InteractiveButtonMessageObject (
+        "whatsapp",
+        "individual",
+        "919820011185",
+        "interactive",
+        InteractiveObject (
+            "button",
+        InteractiveBody (
+            "View Now"
+    ),
+        InteractiveAction (
+            listOf (
+                buttonRow1,
+                buttonRow2
+            )
+        )
+
+        )
+    )
+        val gson = Gson()
+        val interactiveButtonMessageString:String = gson.toJson (interactiveButtonMessageObject) 
+        println (interactiveButtonMessageString)
+        sendRequestToFacebook (interactiveButtonMessageString)
+
+    
+
+
 }
 fun sendImage (){
     val imageMessageObject = ImageMessageObject (
         "whatsapp",
         "individual",
         "919820011185",
-        "type": "image",
+        "image",
         ImageObject (
             "https://images.pling.com/img/00/00/48/70/84/1220648/e4fff450a6306e045f5c26801ce31c3efaeb.jpg"
         )
     )
     val gson = Gson()
-    val imageMessageString:String = gson.toJson (imageMessageString) 
+    val imageMessageString:String = gson.toJson (imageMessageObject) 
     println (imageMessageString)
     sendRequestToFacebook (imageMessageString)
     
@@ -132,10 +177,14 @@ fun sendReactionMessage (){
         "919820011185",
         "reaction",
         ReactionObject (
-            "test",
+            "wamid.HBgMOTE5ODIwMDExMTg1FQIAERgSRUY4MkI3QTNGRTI0QTQ3NUZCAA==",
             "\uD83D\uDE00"
         )
     )
+    val gson = Gson()
+    val reactionMessageString:String = gson.toJson (reactionMessageObject) 
+    println (reactionMessageString)
+    sendRequestToFacebook (reactionMessageString)
 
 }
 fun sendTextMessage (){
@@ -170,5 +219,7 @@ fun sendTemplateMessage (){
 
 fun main() {
     // println(App().sendTemplateMessage())
-    println(App().sendTextMessage())
+    // println(App().sendTextMessage())
+    // println (App().sendReactionMessage ())
+    println (App().sendInteractiveButtonMessage())
 }
